@@ -24,4 +24,11 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>BumpInt.c</name>
+			<type>1</type>
+			<location>C:/ti/tirslk_max_1_00_02/inc/BumpInt.c</location>
+		</link>
+	</linkedResources>
 </projectDescription>
