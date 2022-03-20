@@ -23,23 +23,30 @@ struct State {
   uint16_t L_Duty;             // 0-14998
   uint16_t R_Duty;             // 0-14998
   uint32_t delay;              // time to delay in 1ms
+  uint8_t function;
   const struct State *next[6]; // Next if 3-bit input is 0-7
 };
 typedef const struct State State_t;
 
-#define Center &fsm[0]
-#define Left   &fsm[1]
-#define H_left &fsm[2]
-#define Right  &fsm[3]
-#define H_right &fsm[4]
-#define Stop   &fsm[5]
-State_t fsm[6]={
-  {4000, 4000, 100, { Center, Left, H_left, Right, H_right, Stop}},   // Center
-  {1000, 0, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Left of line (turn right)
-  {3000, 0, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_left of line (turn hard right)
-  {0, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Right of line (turn left)
-  {0, 3000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_right of line (turn hard left)
-  {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop, Stop }}   // Stop
+#define L_Center &fsm[0]
+#define R_Center &fsm[1]
+#define Left   &fsm[2]
+#define H_left &fsm[3]
+#define Right  &fsm[4]
+#define H_right &fsm[5]
+#define L_Lost &fsm[6]
+#define R_Lost &fsm[7]
+#define Stop   &fsm[8]
+State_t fsm[9]={
+  {4000, 4000,  10, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},   // Left Center
+  {4000, 4000,  10, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},   // Right Center
+  {4000, 3000, 100, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left of line (turn right)
+  {2500, 2500, 100, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // H_left of line (turn hard right)
+  {3000, 4000, 100, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right of line (turn left)
+  {2500, 2500, 100, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // H_right of line (turn hard left)
+  {3500, 3500, 100, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left lost
+  {3500, 3500, 100, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right lost
+  {   0,    0, 500, 0, { Stop,   Stop, Stop,  Stop, Stop, Stop }}   // Stop
 };
 
 State_t *Spt;  // pointer to the current state
@@ -48,30 +55,27 @@ void PORT4_IRQHandler(void){
     // write this as part of Lab 14
     P4->IFG &= ~0xED; // clear flags
     Spt = Stop;
-//    if(Spt == Stop){
-//        Spt = Center;
-//    }
-//    else{
-//        Spt = Stop;
-//    }
 }
 
-uint8_t nextStateIDX(int32_t D){
+uint8_t nextStateIDX(int32_t D, uint8_t bits){
     // Left
     if(D<=-14300 && D>=-23800){
         return 1;
     }
     // Hard Left
-    if(D<=-23800){
+    if(D<-23800){
         return 2;
     }
     // Right
-    if(D>=14300 && D<=-23800){
+    if(D>=14300 && D<=23800){
         return 3;
     }
     // Hard Right
-    if(D>=23800){
+    if(D>23800){
         return 4;
+    }
+    if(bits == 0x00000000){
+        return 5;
     }
     return 0;
 }
@@ -84,16 +88,24 @@ void main(void){
     LaunchPad_Init();
     BumpInt_Init();
     Reflectance_Init();
-    Spt = Center;
+    Spt = L_Center;
 
     while(1){
         L_Motor = Spt->L_Duty;            // set output from FSM
         R_Motor = Spt->R_Duty;            // set output from FSM
-        Motor_Forward(L_Motor,R_Motor);
+        if(Spt->function == 1){
+            Motor_Right(L_Motor,R_Motor);
+        }
+        if(Spt->function == 2){
+            Motor_Left(L_Motor,R_Motor);
+        }
+        else{
+            Motor_Forward(L_Motor,R_Motor);
+        }
         Clock_Delay1ms(Spt->delay);   // wait
         Data = Reflectance_Read(1000);
         Dist = Reflectance_Position(Data);    // read sensors
-        NS = nextStateIDX(Dist);
+        NS = nextStateIDX(Dist, Data);
 
         Spt = Spt->next[NS];       // next depends on input and state
 
