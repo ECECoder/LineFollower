@@ -23,19 +23,23 @@ struct State {
   uint16_t L_Duty;             // 0-14998
   uint16_t R_Duty;             // 0-14998
   uint32_t delay;              // time to delay in 1ms
-  const struct State *next[5]; // Next if 3-bit input is 0-7
+  const struct State *next[7]; // Next if 3-bit input is 0-7
 };
 typedef const struct State State_t;
 
 #define Center &fsm[0]
 #define Left   &fsm[1]
-#define Right  &fsm[2]
-#define Stop   &fsm[3]
-State_t fsm[4]={
-  {5000, 5000, 100, { Center, Left, Right, Stop, Stop}},   // Center
-  {3000, 1000, 100, { Center, Left, Right, Stop, Stop }},  // Left of line (turn right)
-  {1000, 3000, 100, { Center, Left, Right, Stop, Stop }},  // Right of line (turn left)
-  {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop }}   // Right of line (turn left)
+#define H_left &fsm[2]
+#define Right  &fsm[3]
+#define H_right &fsm[4]
+#define Stop   &fsm[5]
+State_t fsm[6]={
+  {5000, 5000, 100, { Center, Left, H_left, Right, H_right, Stop}},   // Center
+  {3000, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Left of line (turn right)
+  {5000, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_left of line (turn hard right)
+  {1000, 3000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Right of line (turn left)
+  {1000, 5000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_right of line (turn hard left)
+  {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop, Stop }}   // Stop
 };
 
 State_t *Spt;  // pointer to the current state
@@ -53,11 +57,21 @@ void PORT4_IRQHandler(void){
 }
 
 uint8_t nextStateIDX(int32_t D){
-    if(D<=-14300){
+    // Left
+    if(D<=-14300 && D>=-23800){
         return 1;
     }
-    if(D>=14300){
+    // Hard Left
+    if(D<=-23800){
         return 2;
+    }
+    // Right
+    if(D>=14300 && D<=-23800){
+        return 3;
+    }
+    // Hard Right
+    if(D>=23800){
+        return 4;
     }
     return 0;
 }
