@@ -23,7 +23,7 @@ struct State {
   uint16_t L_Duty;             // 0-14998
   uint16_t R_Duty;             // 0-14998
   uint32_t delay;              // time to delay in 1ms
-  const struct State *next[7]; // Next if 3-bit input is 0-7
+  const struct State *next[6]; // Next if 3-bit input is 0-7
 };
 typedef const struct State State_t;
 
