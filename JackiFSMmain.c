@@ -1,53 +1,84 @@
 #include <stdint.h>
 #include "msp.h"
-#include "../inc/Clock.h"
-#include "../inc/CortexM.h"
-#include "../inc/PWM.h"
-#include "../inc/LaunchPad.h"
-#include "../inc/TExaS.h"
-#include "../inc/AP.h"
-#include "../inc/UART0.h"
-#include "../inc/Bump.h"
-#include "../inc/Reflectance.h"
-#include "../inc/Motor.h"
+#include "Clock.h"
+#include "CortexM.h"
+//#include "../inc/PWM.h"
+#include "LaunchPad.h"
+//#include "../inc/TExaS.h"
+//#include "../inc/AP.h"
+//#include "../inc/UART0.h"
+#include "BumpInt.h"
+#include "Reflectance.h"
+#include "Motor.h"
+
+uint16_t L_Motor;
+uint16_t R_Motor;
+int32_t Output;
+uint8_t Data;
+int32_t Dist;
+uint8_t NS;
 
 // Linked data structure
 struct State {
   uint16_t L_Duty;             // 0-14998
   uint16_t R_Duty;             // 0-14998
   uint32_t delay;              // time to delay in 1ms
-  const struct State *next[4]; // Next if 3-bit input is 0-7
+  const struct State *next[5]; // Next if 3-bit input is 0-7
 };
 typedef const struct State State_t;
 
 #define Center &fsm[0]
 #define Left   &fsm[1]
 #define Right  &fsm[2]
-State_t fsm[3]={
-  {500, 500, { Right, Left,   Right,  Center }},  // Center
-  {500, 200, { Left,  Center, Right,  Center }},  // Left of line (turn right)
-  {200, 500, { Right, Left,   Center, Center }}   // Right of line (turn left)
+#define Stop   &fsm[3]
+State_t fsm[4]={
+  {500, 500, 500, { Center, Left, Right, Stop, Stop}},   // Center
+  {500, 200, 500, { Center, Left, Right, Stop, Stop }},  // Left of line (turn right)
+  {200, 500, 500, { Center, Left, Right, Stop, Stop }},  // Right of line (turn left)
+  {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop }}   // Right of line (turn left)
 };
+
 State_t *Spt;  // pointer to the current state
-uint16_t L_Motor;
-uint16_t R_Motor;
-int32_t Output;
+
+void PORT4_IRQHandler(void){
+    // write this as part of Lab 14
+    P4->IFG &= ~0xED; // clear flags
+    if(Spt == Stop){
+        Spt = Center;
+    }
+    Spt = Stop;
+}
+
+uint8_t nextStateIDX(int32_t D){
+    if(D<=-14300){
+        return 1;
+    }
+    if(D>=14300){
+        return 2;
+    }
+    return 0;
+}
+
 
 void main(void){
     // write this as a robot challenge
     Clock_Init48MHz();
     Motor_Init();
     LaunchPad_Init();
+    BumpInt_Init();
     Reflectance_Init();
     Spt = Center;
 
     while(1){
         L_Motor = Spt->L_Duty;            // set output from FSM
         R_Motor = Spt->R_Duty;            // set output from FSM
-        Motor_Forward(L_Motor,R_Motor));
+        Motor_Forward(L_Motor,R_Motor);
         Clock_Delay1ms(Spt->delay);   // wait
-        Input = LaunchPad_Input();    // read sensors
-        Spt = Spt->next[Input];       // next depends on input and state
+        Data = Reflectance_Read(1000);
+        Dist = Reflectance_Position(Data);    // read sensors
+        NS = nextStateIDX(Dist);
+
+        Spt = Spt->next[NS];       // next depends on input and state
 
   }
 
