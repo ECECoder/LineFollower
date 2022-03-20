@@ -34,11 +34,11 @@ typedef const struct State State_t;
 #define H_right &fsm[4]
 #define Stop   &fsm[5]
 State_t fsm[6]={
-  {5000, 5000, 100, { Center, Left, H_left, Right, H_right, Stop}},   // Center
-  {3000, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Left of line (turn right)
-  {5000, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_left of line (turn hard right)
-  {1000, 3000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Right of line (turn left)
-  {1000, 5000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_right of line (turn hard left)
+  {4000, 4000, 100, { Center, Left, H_left, Right, H_right, Stop}},   // Center
+  {1000, 0, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Left of line (turn right)
+  {3000, 0, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_left of line (turn hard right)
+  {0, 1000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // Right of line (turn left)
+  {0, 3000, 100, { Center, Left, H_left, Right, H_right, Stop }},  // H_right of line (turn hard left)
   {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop, Stop }}   // Stop
 };
 
