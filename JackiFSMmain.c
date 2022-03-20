@@ -40,9 +40,9 @@ typedef const struct State State_t;
 State_t fsm[9]={
   {4000, 4000,  10, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},   // Left Center
   {4000, 4000,  10, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},   // Right Center
-  {4000, 3000, 100, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left of line (turn right)
+  {4000, 3000, 100, 0, { L_Center, Left, H_left, Right, H_right, L_Center }},  // Left of line (turn right)
   {2500, 2500, 100, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // H_left of line (turn hard right)
-  {3000, 4000, 100, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right of line (turn left)
+  {3000, 4000, 100, 0, { R_Center, Left, H_left, Right, H_right, R_Center }},  // Right of line (turn left)
   {2500, 2500, 100, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // H_right of line (turn hard left)
   {3500, 3500, 100, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left lost
   {3500, 3500, 100, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right lost
@@ -96,7 +96,7 @@ void main(void){
         if(Spt->function == 1){
             Motor_Right(L_Motor,R_Motor);
         }
-        if(Spt->function == 2){
+        else if(Spt->function == 2){
             Motor_Left(L_Motor,R_Motor);
         }
         else{
