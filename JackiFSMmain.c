@@ -32,9 +32,9 @@ typedef const struct State State_t;
 #define Right  &fsm[2]
 #define Stop   &fsm[3]
 State_t fsm[4]={
-  {5000, 5000, 500, { Center, Left, Right, Stop, Stop}},   // Center
-  {5000, 2000, 500, { Center, Left, Right, Stop, Stop }},  // Left of line (turn right)
-  {2000, 5000, 500, { Center, Left, Right, Stop, Stop }},  // Right of line (turn left)
+  {5000, 5000, 100, { Center, Left, Right, Stop, Stop}},   // Center
+  {3000, 1000, 100, { Center, Left, Right, Stop, Stop }},  // Left of line (turn right)
+  {1000, 3000, 100, { Center, Left, Right, Stop, Stop }},  // Right of line (turn left)
   {  0,   0, 500, { Stop,   Stop, Stop,  Stop, Stop }}   // Right of line (turn left)
 };
 
@@ -43,12 +43,13 @@ State_t *Spt;  // pointer to the current state
 void PORT4_IRQHandler(void){
     // write this as part of Lab 14
     P4->IFG &= ~0xED; // clear flags
-    if(Spt == Stop){
-        Spt = Center;
-    }
-    else{
-        Spt = Stop;
-    }
+    Spt = Stop;
+//    if(Spt == Stop){
+//        Spt = Center;
+//    }
+//    else{
+//        Spt = Stop;
+//    }
 }
 
 uint8_t nextStateIDX(int32_t D){
