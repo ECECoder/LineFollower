@@ -32,14 +32,14 @@ typedef const struct State State_t;
 #define R_Lost &fsm[7]
 #define Stop   &fsm[8]
 State_t fsm[9]={
-  {6000, 6000,  20, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},   // Left Center
-  {6000, 6000,  20, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},   // Right Center
-  {6000, 5000,  60, 0, { L_Center, Left, H_left, Right, H_right, L_Center }},  // Left of line (turn right)
-  {3500, 1500,  60, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // H_left of line (turn hard right)
-  {5000, 5000,  60, 0, { R_Center, Left, H_left, Right, H_right, R_Center }},  // Right of line (turn left)
-  {1500, 3500,  60, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // H_right of line (turn hard left)
-  {4000, 3500, 100, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left lost
-  {3500, 4000, 100, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right lost
+  {7000, 7000,  30, 0, { L_Center, Left, H_left, Right, H_right, L_Lost }},   // Left Center
+  {7000, 7000,  30, 0, { R_Center, Left, H_left, Right, H_right, R_Lost }},   // Right Center
+  {7000, 6000,  20, 0, { L_Center, Left, H_left, Right, H_right, L_Center }},  // Left of line (turn right)
+  {4000, 1500,  20, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // H_left of line (turn hard right)
+  {6000, 7000,  20, 0, { R_Center, Left, H_left, Right, H_right, R_Center }},  // Right of line (turn left)
+  {1500, 4000,  20, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // H_right of line (turn hard left)
+  {4500, 4000,  30, 1, { L_Center, Left, H_left, Right, H_right, L_Lost }},  // Left lost
+  {4000, 4500,  30, 2, { R_Center, Left, H_left, Right, H_right, R_Lost }},  // Right lost
   {   0,    0, 500, 0, { Stop,   Stop, Stop,  Stop, Stop, Stop }}   // Stop
 };
 
