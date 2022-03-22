@@ -3,7 +3,7 @@
 #include "Clock.h"
 #include "CortexM.h"
 //#include "../inc/PWM.h"
-#include "LaunchPad.h"
+//#include "LaunchPad.h"
 //#include "../inc/TExaS.h"
 //#include "../inc/AP.h"
 //#include "../inc/UART0.h"
@@ -13,7 +13,7 @@
 
 uint16_t L_Motor;
 uint16_t R_Motor;
-int32_t Output;
+//int32_t Output;
 uint8_t Data;
 int32_t Dist;
 uint8_t NS;
@@ -74,6 +74,7 @@ uint8_t nextStateIDX(int32_t D, uint8_t bits){
     if(D>23800){
         return 4;
     }
+    // Stop
     if(bits == 0x00000000){
         return 5;
     }
@@ -85,7 +86,7 @@ void main(void){
     // write this as a robot challenge
     Clock_Init48MHz();
     Motor_Init();
-    LaunchPad_Init();
+    //LaunchPad_Init();
     BumpInt_Init();
     Reflectance_Init();
     Spt = L_Center;
