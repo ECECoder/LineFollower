@@ -89,5 +89,5 @@ void BumpInt_Init(void);
  * @note  result is a packed, right-justified, positive logic
  * @brief  Read current state of 6 switches
  */
-uint8_t BumpInt_Read(void);
+//uint8_t BumpInt_Read(void);
 

@@ -48,7 +48,6 @@ policies, either expressed or implied, of the FreeBSD Project.
 
 #include <stdint.h>
 #include "msp.h"
-#include "CortexM.h"
 
 // *******Lab 13 solution*******
 
