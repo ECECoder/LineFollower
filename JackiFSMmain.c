@@ -2,11 +2,6 @@
 #include "msp.h"
 #include "Clock.h"
 #include "CortexM.h"
-//#include "../inc/PWM.h"
-//#include "LaunchPad.h"
-//#include "../inc/TExaS.h"
-//#include "../inc/AP.h"
-//#include "../inc/UART0.h"
 #include "BumpInt.h"
 #include "Reflectance.h"
 #include "Motor.h"
@@ -87,7 +82,6 @@ void main(void){
 
     Clock_Init48MHz();
     Motor_Init();
-    //LaunchPad_Init();
     BumpInt_Init();
     Reflectance_Init();
     Spt = L_Center;
